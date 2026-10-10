@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Borang Chatbot PS Plumber Kluang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow reading column; sticky progress bar; a card per question, grouped by section. */
+:root {
+  --bg: #f3f6fa; --surface: #ffffff; --ink: #0f1b2d; --muted: #5b6b80; --line: #dbe3ee;
+  --accent: #1d4ed8; --accent-ink: #ffffff; --accent-soft: #e6eefc; --ok: #15803d; --warn: #b45309;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1220; --surface: #121c2e; --ink: #e8eef8; --muted: #9aaac0; --line: #24324a;
+  --accent: #6d9bff; --accent-ink: #0b1220; --accent-soft: #1a2a4a; --ok: #4ade80; --warn: #fbbf24; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0b1220; --surface: #121c2e; --ink: #e8eef8; --muted: #9aaac0; --line: #24324a;
+  --accent: #6d9bff; --accent-ink: #0b1220; --accent-soft: #1a2a4a; --ok: #4ade80; --warn: #fbbf24; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 680px; margin: 0 auto; padding-inline: 16px; padding-block: 0 96px; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar-in { max-width: 680px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+.prog { flex: 1; min-width: 0; }
+.prog-top { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+.prog-top b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.track { height: 6px; background: var(--line); border-radius: 99px; margin-top: 6px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .3s; }
+.save { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.save.ok { color: var(--ok); } .save.warn { color: var(--warn); }
+
+header.hero { padding-block: 28px 8px; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 7vw, 40px); line-height: 1.08; margin: 6px 0 12px; text-wrap: balance; }
+.lead { color: var(--muted); margin: 0 0 14px; max-width: 60ch; }
+.howto { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; font-size: 14.5px; }
+.howto div { display: flex; gap: 10px; }
+.howto span.k { color: var(--accent); font-weight: 700; min-width: 18px; }
+
+nav.toc { display: flex; gap: 8px; overflow-x: auto; padding-block: 16px 4px; scrollbar-width: none; }
+nav.toc a { flex-shrink: 0; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 99px; padding: 6px 12px; font-size: 13px; font-weight: 600; }
+nav.toc a .n { color: var(--muted); font-weight: 500; margin-left: 4px; font-variant-numeric: tabular-nums; }
+nav.toc a.done { border-color: var(--ok); }
+
+section.sec { padding-top: 26px; scroll-margin-top: 70px; }
+.sec-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.sec-num { font-family: var(--display); font-weight: 800; font-size: 15px; color: var(--accent); font-variant-numeric: tabular-nums; }
+h2 { font-family: var(--display); font-weight: 800; font-size: 22px; margin: 0; text-wrap: balance; }
+.sec-why { color: var(--muted); font-size: 14px; margin: 2px 0 12px; }
+
+.q { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 16px; margin-bottom: 10px; }
+.q.answered { border-color: color-mix(in srgb, var(--ok) 45%, var(--line)); }
+.q label.ql, .q .ql { display: block; font-weight: 700; font-size: 15.5px; margin-bottom: 2px; }
+.q .qn { color: var(--muted); font-weight: 600; margin-right: 4px; font-variant-numeric: tabular-nums; }
+.q .help { color: var(--muted); font-size: 13.5px; margin: 0 0 10px; }
+input[type=text], textarea {
+  width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--bg);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px;
+}
+textarea { min-height: 84px; resize: vertical; }
+input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: inherit; font-size: 14.5px; font-weight: 600; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; text-align: left; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.chip:focus-visible, .btn:focus-visible, nav.toc a:focus-visible { outline: 3px solid var(--accent-soft); outline-offset: 2px; }
+.other { margin-top: 8px; }
+
+.finish { margin-top: 30px; background: var(--surface); border: 1.5px solid var(--accent); border-radius: 16px; padding: 18px 16px; display: grid; gap: 12px; }
+.finish h2 { font-size: 20px; }
+.finish p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: inherit; font-weight: 700; font-size: 15px; border-radius: 12px; padding: 12px 18px; cursor: pointer; border: 1.5px solid var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; color: var(--accent); }
+.note { font-size: 13.5px; }
+.note.ok { color: var(--ok); } .note.warn { color: var(--warn); }
+#copyBox { display: none; }
+#copyBox.show { display: block; }
+@media (prefers-reduced-motion: reduce) { .fill { transition: none; } html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+<style>html,body{margin:0}body{-webkit-text-size-adjust:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="bar"><div class="bar-in">
+  <div class="prog">
+    <div class="prog-top"><span><b id="cnt">0</b> / <b id="tot">0</b> soalan dijawab</span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+  <div class="save" id="save">Belum ada jawapan</div>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">PS Plumber Kluang × ASMOS Solutions</div>
+    <h1>Borang untuk bina chatbot WhatsApp anda</h1>
+    <p class="lead">Assalamualaikum Encik Alif. Jawapan di sini jadi "otak" chatbot: cara ia balas pelanggan, soalan yang ia tanya, dan bila ia maklumkan anda. Jawab ikut cara anda sendiri, pendek pun tak apa. Bahagian paling penting: senarai harga.</p>
+    <div class="howto">
+      <div><span class="k">1</span><span>Lebih kurang 10 minit. Boleh berhenti dan sambung bila-bila, jawapan tak hilang.</span></div>
+      <div><span class="k">2</span><span>Kalau tak pasti, tulis "tak pasti" atau langkau. Kita bincang nanti.</span></div>
+      <div><span class="k">3</span><span>Jawapan disimpan automatik semasa anda menaip. Bila siap, tekan <b>Hantar</b> di bawah sekali.</span></div>
+    </div>
+  </header>
+
+  <nav class="toc" id="toc" aria-label="Bahagian"></nav>
+  <form id="form" autocomplete="off" novalidate></form>
+
+  <div class="finish" id="finish">
+    <h2>Dah siap?</h2>
+    <p id="finishMsg">Tekan Hantar. Aman akan semak jawapan anda dan hubungi anda jika ada yang perlu diperjelaskan.</p>
+    <div class="btns">
+      <button class="btn primary" type="button" id="submitBtn">Hantar jawapan</button>
+      <button class="btn ghost" type="button" id="copyBtn">Salin semua jawapan</button>
+    </div>
+    <div class="note" id="finishNote"></div>
+    <div id="copyBox"><textarea id="copyText" rows="8" readonly></textarea></div>
+  </div>
+</div>
+
+<script>
+(() => {
+// ── Questions. id = stable key stored with the answer; never rename an id once live. ──
+const SECTIONS = [
+  { id: "bisnes", title: "Perniagaan anda", why: "Supaya bot tahu bila anda bekerja.", qs: [
+    { id: "waktu", t: "textarea", q: "Hari dan waktu kerja anda", help: "Cth: Isnin-Sabtu 8.30 pagi - 6 petang. Ahad cuti. Jumaat rehat 12.15-2.30." },
+  ]},
+  { id: "kerja", title: "Kerja yang anda buat", why: "Supaya bot faham masalah pelanggan dan tanya soalan yang betul.", qs: [
+    { id: "jenis_kerja", t: "multi", q: "Tandakan semua jenis kerja yang anda ambil", other: true,
+      opts: ["Paip bocor", "Tangki air / bebola (float valve)", "Sinki / floor trap tersumbat", "Tandas / kumbahan tersumbat", "Pasang paip baru (piping)", "Tapping laluan paip", "Tukar kepala paip / sinki", "Pam tandas / cistern", "Water heater", "Pam air (water pump)", "Penapis air (water filter)", "Meter air / bil air tinggi", "Kerja rumah kedai / restoran"] },
+    { id: "kerja_tak", t: "textarea", q: "Kerja yang anda TAK ambil", help: "Cth: aircond, elektrik, bumbung. Bot akan tolak dengan sopan atau rujuk kepada anda." },
+    { id: "kerja_top", t: "textarea", q: "3 kerja yang paling kerap anda dapat", help: "Bot akan paling mahir dalam kerja-kerja ini." },
+    { id: "soalan_biasa", t: "textarea", q: "Bila pelanggan kata \"paip bocor\", apa soalan yang anda biasa tanya dulu?", help: "Tulis macam anda tanya pelanggan. Cth: bocor kat mana? paip jenis apa? rumah teres ke apartment?" },
+    { id: "inspection_kerja", t: "textarea", q: "Kerja mana yang anda MESTI pergi tengok dulu sebelum boleh bagi harga?", help: "Cth: paip dalam dinding, pasang paip baru, kumbahan rumah kedai." },
+  ]},
+  { id: "harga", title: "Harga & bayaran", why: "Bot guna harga untuk kira deposit dan tunjuk anggaran kepada anda. Anda tentukan sama ada pelanggan nampak harga.", qs: [
+    { id: "senarai_harga", t: "textarea", q: "Senarai harga anda (sila senaraikan SEMUA kerja yang anda buat, dengan harga atau julat harga)", help: "Bahagian paling penting. Lebih lengkap, lebih pandai bot. Cth: Paip bocor PVC RM150 satu titik. Tukar bebola tangki RM350-450. Sinki tersumbat RM250... Kalau ada senarai dalam Excel/gambar, tulis \"ada fail\" dan hantar kepada Aman." },
+    { id: "caj_tambahan", t: "textarea", q: "Caj tambahan yang anda kenakan", help: "Cth: pengangkutan kawasan jauh, kerja malam, hujung minggu, kecemasan, panjat siling." },
+    { id: "caj_periksa", t: "text", q: "Ada caj datang periksa (inspection)? Berapa? Dipotong jika pelanggan teruskan?", help: "Cth: RM50, dipotong dari harga kerja jika teruskan." },
+    { id: "deposit", t: "choice", q: "Adakah anda minta deposit sebelum mula kerja?", opts: ["Tak pernah", "Ya, untuk kerja besar sahaja", "Ya, untuk semua kerja"] },
+    { id: "deposit_detail", t: "text", q: "Jika ya: kerja berapa ringgit ke atas, dan berapa peratus?", help: "Cth: kerja RM300 ke atas, deposit 50%." },
+    { id: "bayar_bila", t: "multi", q: "Bagaimana pelanggan biasa bayar?", opts: ["Tunai di tapak", "Transfer selepas kerja siap", "DuitNow / QR", "Deposit dulu, baki selepas siap"], other: true },
+    { id: "diskaun", t: "textarea", q: "Bila pelanggan minta kurang harga, apa yang anda biasa jawab?", help: "Bot akan ikut gaya anda." },
+  ]},
+  { id: "tempahan", title: "Tempahan & pengesahan masa", why: "Bot kumpul semua maklumat, kemudian anda sahkan masa dengan satu tekan.", qs: [
+    { id: "wajib", t: "multi", q: "Maklumat yang WAJIB ada sebelum bot hantar kes kepada anda", other: true,
+      opts: ["Nama pelanggan", "Kawasan / taman", "Alamat penuh", "Pin lokasi", "Gambar masalah", "Masa yang pelanggan mahu", "Jenis rumah (teres, apartment, kedai)", "Jenis paip"] },
+    { id: "sahkan_siapa", t: "choice", q: "Siapa yang boleh sahkan masa tempahan?", opts: ["Saya sahaja", "Saya atau pekerja saya", "Saya atau isteri / admin"] },
+    { id: "sahkan_cepat", t: "choice", q: "Bila dapat notifikasi, berapa cepat anda biasanya boleh sahkan masa?", help: "Bila bot dah dapat semua maklumat pelanggan, app akan hantar notifikasi kepada anda untuk SAHKAN MASA tempahan. Anda tekan sahkan, dan bot terus beritahu pelanggan. Soalan ini untuk bot tahu berapa lama pelanggan perlu tunggu.", opts: ["Dalam 15 minit", "Dalam 1 jam", "Beberapa jam", "Hujung hari"] },
+    { id: "kerja_sehari", t: "text", q: "Berapa kerja sehari yang anda mampu? Slot pagi / petang?", help: "Cth: 3-4 kerja. Pagi 9-12, petang 2-6." },
+    { id: "hari_sama", t: "choice", q: "Boleh terima kerja untuk hari yang sama?", opts: ["Ya, jika masih ada slot", "Jarang, biasanya esok", "Tidak"] },
+    { id: "lambat_sahkan", t: "textarea", q: "Kalau anda lambat sahkan, bot patut cakap apa kepada pelanggan?", help: "Cth: \"Baik, saya semak jadual dulu ye, nanti saya maklumkan.\"" },
+  ]},
+  { id: "pekerja", title: "Pekerja", why: "Untuk tahu siapa yang perlu dimaklumkan bila ada kerja.", qs: [
+    { id: "ada_pekerja", t: "choice", q: "Adakah anda ada pekerja yang turun ke tapak?", opts: ["Tiada, saya sendiri", "1 orang", "2 - 3 orang", "Lebih 3 orang"] },
+    { id: "pekerja_wa", t: "choice", q: "Patutkah bot hantar maklumat kerja terus kepada pekerja di WhatsApp?", help: "Contoh mesej yang bot akan hantar kepada pekerja: \"Salam, ada job baru. Paip bocor bawah sinki dapur (PVC), Taman Sri Kluang. Pelanggan: Encik Rahman. Masa: esok 3 petang. Boleh pergi ke?\" Pekerja balas \"boleh\" atau cadang masa lain.", opts: ["Ya", "Tidak, saya sendiri uruskan pekerja", "Tak pasti"] },
+  ]},
+  { id: "kecemasan", title: "Kecemasan", why: "Kes kecemasan dimaklumkan kepada anda dengan notifikasi khas.", qs: [
+    { id: "kecemasan_apa", t: "textarea", q: "Apa yang anda kira sebagai KECEMASAN?", help: "Cth: paip pecah, air banjir dalam rumah, tiada air langsung, kumbahan melimpah." },
+    { id: "malam", t: "choice", q: "Adakah anda terima kerja kecemasan waktu malam?", opts: ["Ya", "Kadang-kadang, ikut keadaan", "Tidak"] },
+    { id: "malam_detail", t: "text", q: "Jika ya: sampai jam berapa? Ada caj lebih?", help: "Cth: sampai 11 malam, caj tambahan RM100." },
+    { id: "kecemasan_maklum", t: "multi", q: "Bila ada kecemasan, macam mana anda mahu dimaklumkan?", opts: ["Notifikasi kuat di app", "Panggilan telefon", "Mesej WhatsApp ke nombor peribadi"] },
+  ]},
+  { id: "gaya", title: "Chatbot anda", why: "Supaya bot boleh jawab soalan pelanggan dengan betul.", qs: [
+    { id: "nama_bot", t: "text", q: "Nama untuk admin chatbot (atau tulis \"tiada nama\")", help: "Cth: Admin Sara, Kak Ina, atau hanya \"admin PS Plumber\"." },
+    { id: "soalan_lazim", t: "textarea", q: "Soalan yang pelanggan selalu tanya, dan jawapan anda", help: "Bot perlukan jawapan sebenar anda. Cth: Ada warranty? (\"ada, 3 bulan untuk kerja paip\"). Bahan siapa beli? (\"kami bawa, termasuk dalam harga\"). Kerja ambil masa berapa lama? (\"tukar bebola lebih kurang 1 jam\"). Boleh datang hari Ahad / cuti umum? Ada caj kalau datang tengok je?" },
+  ]},
+  { id: "app", title: "App & notifikasi", why: "App di telefon anda untuk lihat chat, sahkan tempahan dan ambil alih chat bila perlu.", qs: [
+    { id: "telefon", t: "choice", q: "Telefon anda jenis apa?", opts: ["Android", "iPhone"] },
+    { id: "pengguna_app", t: "text", q: "Siapa lagi akan guna app ini? (selain anda)", help: "Cth: isteri, admin, tiada." },
+  ]},
+]
+
+const ALL = SECTIONS.flatMap(s => s.qs)
+const LOCAL_KEY = "borang-alif-v1"
+const DOC_PATH = "jawapan/borang"
+
+// ── State ──
+let answers = {}
+let submittedAt = null
+let localAt = 0
+try { const s = JSON.parse(localStorage.getItem(LOCAL_KEY) || "null"); if (s) { answers = s.answers || {}; submittedAt = s.submittedAt || null; localAt = s.at || 0 } } catch {}
+
+const $ = id => document.getElementById(id)
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]))
+const filled = v => Array.isArray(v) ? v.length > 0 : !!(v && String(v).trim())
+
+// ── Render ──
+function render() {
+  let n = 0
+  $("toc").innerHTML = SECTIONS.map((s, i) =>
+    `<a href="#${s.id}" data-sec="${s.id}">${i + 1}. ${esc(s.title)}<span class="n"></span></a>`).join("")
+  $("form").innerHTML = SECTIONS.map((s, i) => `
+    <section class="sec" id="${s.id}">
+      <div class="sec-head"><span class="sec-num">${i + 1}</span><h2>${esc(s.title)}</h2></div>
+      <p class="sec-why">${esc(s.why)}</p>
+      ${s.qs.map(q => { n++; return qHtml(q, n) }).join("")}
+    </section>`).join("")
+  $("tot").textContent = ALL.length
+  refreshAll()
+}
+
+function qHtml(q, n) {
+  const v = answers[q.id]
+  const head = `<span class="ql"><span class="qn">${n}.</span>${esc(q.q)}</span>${q.help ? `<p class="help">${esc(q.help)}</p>` : ""}`
+  if (q.t === "text") return `<div class="q" data-q="${q.id}"><label class="ql" for="f_${q.id}"><span class="qn">${n}.</span>${esc(q.q)}</label>${q.help ? `<p class="help">${esc(q.help)}</p>` : ""}<input type="text" id="f_${q.id}" data-id="${q.id}" value="${esc(v || "")}"></div>`
+  if (q.t === "textarea") return `<div class="q" data-q="${q.id}"><label class="ql" for="f_${q.id}"><span class="qn">${n}.</span>${esc(q.q)}</label>${q.help ? `<p class="help">${esc(q.help)}</p>` : ""}<textarea id="f_${q.id}" data-id="${q.id}">${esc(v || "")}</textarea></div>`
+  const multi = q.t === "multi"
+  const sel = multi ? (Array.isArray(v) ? v : []) : v
+  const opts = [...q.opts, ...(q.other ? ["Lain-lain"] : [])]
+  const chips = opts.map(o => {
+    const on = multi ? sel.includes(o) : sel === o
+    return `<button type="button" class="chip" data-id="${q.id}" data-opt="${esc(o)}" aria-pressed="${on}">${esc(o)}</button>`
+  }).join("")
+  const otherOn = multi ? sel.includes("Lain-lain") : sel === "Lain-lain"
+  const otherField = q.other ? `<input type="text" class="other" id="f_${q.id}_lain" data-id="${q.id}_lain" placeholder="Nyatakan..." value="${esc(answers[q.id + "_lain"] || "")}" ${otherOn ? "" : "hidden"}>` : ""
+  return `<div class="q" data-q="${q.id}" role="group" aria-label="${esc(q.q)}">${head}<div class="chips">${chips}</div>${otherField}</div>`
+}
+
+function refreshAll() {
+  let n = 0
+  for (const q of ALL) {
+    const ok = filled(answers[q.id])
+    if (ok) n++
+    const card = document.querySelector(`[data-q="${q.id}"]`)
+    if (card) card.classList.toggle("answered", ok)
+  }
+  $("cnt").textContent = n
+  $("fill").style.width = (100 * n / ALL.length) + "%"
+  for (const s of SECTIONS) {
+    const done = s.qs.filter(q => filled(answers[q.id])).length
+    const a = document.querySelector(`nav.toc a[data-sec="${s.id}"]`)
+    if (a) { a.querySelector(".n").textContent = `${done}/${s.qs.length}`; a.classList.toggle("done", done === s.qs.length) }
+  }
+  if (submittedAt) $("finishMsg").textContent = "Terima kasih, jawapan anda sudah dihantar. Anda masih boleh ubah jawapan; ia akan disimpan semula."
+}
+
+// ── Saving: this phone always; online to Supabase as he types ──
+const SB_URL = "https://foioyucrphocnagghgxu.supabase.co"
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvaW95dWNycGhvY25hZ2doZ3h1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzODE3MzQsImV4cCI6MjEwNjk1NzczNH0.xpyRWATR2pgPwsFPxKm01W1TV0b5JS6Y9OSOsiTsYn4"
+const TOKEN = "uxF1dDH92Zbt__VocHQ7CMe6"
+let writing = false, pending = false, timer = null, online = null, submitPending = false
+
+async function rpc(fn, body) {
+  const r = await fetch(SB_URL + "/rest/v1/rpc/" + fn, {
+    method: "POST",
+    headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!r.ok) throw new Error("HTTP " + r.status)
+  return r.json()
+}
+
+function setSave(text, cls) { const s = $("save"); s.textContent = text; s.className = "save" + (cls ? " " + cls : "") }
+
+function saveLocal() {
+  localAt = Date.now()
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ answers, submittedAt, at: localAt })) } catch {}
+}
+
+function changed() {
+  saveLocal()
+  refreshAll()
+  setSave("Menyimpan…")
+  clearTimeout(timer)
+  timer = setTimeout(flush, 1000)
+}
+
+async function flush() {
+  if (writing) { pending = true; return }
+  writing = true
+  const sub = submitPending
+  submitPending = false
+  try {
+    await rpc("borang_save", { p_token: TOKEN, p_answers: answers, p_submitted: sub })
+    online = true
+    setSave("Disimpan ✓", "ok")
+  } catch {
+    online = false
+    if (sub) submitPending = true
+    setSave("Tiada internet, disimpan di telefon", "warn")
+  } finally {
+    writing = false
+    if (pending) { pending = false; flush() }
+  }
+}
+
+// ── Input handling ──
+$("form").addEventListener("input", e => {
+  const id = e.target.dataset.id
+  if (!id) return
+  answers[id] = e.target.value
+  changed()
+})
+$("form").addEventListener("click", e => {
+  const chip = e.target.closest(".chip")
+  if (!chip) return
+  const id = chip.dataset.id, opt = chip.dataset.opt
+  const q = ALL.find(x => x.id === id)
+  if (q.t === "multi") {
+    const cur = Array.isArray(answers[id]) ? [...answers[id]] : []
+    const i = cur.indexOf(opt)
+    i >= 0 ? cur.splice(i, 1) : cur.push(opt)
+    answers[id] = cur
+  } else {
+    answers[id] = answers[id] === opt ? "" : opt
+  }
+  const card = chip.closest(".q")
+  const sel = answers[id]
+  card.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed",
+    String(Array.isArray(sel) ? sel.includes(c.dataset.opt) : sel === c.dataset.opt)))
+  const other = card.querySelector(".other")
+  if (other) {
+    const on = Array.isArray(sel) ? sel.includes("Lain-lain") : sel === "Lain-lain"
+    other.hidden = !on
+    if (on && opt === "Lain-lain") other.focus()
+  }
+  changed()
+})
+
+// ── Copy all answers as plain text (for WhatsApp) ──
+function asText() {
+  const lines = ["JAWAPAN BORANG CHATBOT - PS PLUMBER KLUANG", ""]
+  let n = 0
+  for (const [i, s] of SECTIONS.entries()) {
+    lines.push(`== ${i + 1}. ${s.title.toUpperCase()} ==`)
+    for (const q of s.qs) {
+      n++
+      let v = answers[q.id]
+      v = Array.isArray(v) ? v.join(", ") : (v || "")
+      const lain = answers[q.id + "_lain"]
+      if (lain && String(v).includes("Lain-lain")) v = v.replace("Lain-lain", "Lain-lain: " + lain)
+      lines.push(`${n}. ${q.q}`, `→ ${String(v).trim() || "(belum dijawab)"}`, "")
+    }
+  }
+  return lines.join("\n")
+}
+
+$("copyBtn").addEventListener("click", () => {
+  const text = asText()
+  const box = $("copyBox"), ta = $("copyText")
+  ta.value = text
+  const fallback = () => {
+    box.classList.add("show"); ta.focus(); ta.select()
+    $("finishNote").className = "note warn"
+    $("finishNote").textContent = "Tekan lama pada kotak di bawah, pilih Salin (Copy), kemudian tampal di WhatsApp kepada Aman."
+  }
+  try {
+    navigator.clipboard.writeText(text).then(() => {
+      $("finishNote").className = "note ok"
+      $("finishNote").textContent = "Sudah disalin. Buka WhatsApp, tekan lama pada ruang mesej, pilih Tampal (Paste), hantar kepada Aman."
+    }, fallback)
+  } catch { fallback() }
+})
+
+$("submitBtn").addEventListener("click", async () => {
+  submittedAt = new Date().toISOString()
+  saveLocal(); refreshAll()
+  clearTimeout(timer)
+  submitPending = true
+  await flush()
+  const note = $("finishNote")
+  if (online) {
+    note.className = "note ok"
+    note.textContent = "Jawapan sudah dihantar kepada Aman. Terima kasih Encik Alif."
+  } else {
+    note.className = "note warn"
+    note.textContent = "Tiada internet. Jawapan disimpan di telefon ini. Cuba tekan Hantar lagi bila ada internet, atau tekan \"Salin semua jawapan\" dan tampal di WhatsApp kepada Aman."
+  }
+})
+
+render()
+setSave(Object.keys(answers).length ? "Disimpan di telefon ini" : "Belum ada jawapan", "")
+
+// Load what was saved online (e.g. he started on another phone), newest wins.
+;(async () => {
+  try {
+    const d = await rpc("borang_get", { p_token: TOKEN })
+    online = true
+    if (d && d.answers && Object.keys(d.answers).length) {
+      const remoteAt = d.updated_at ? Date.parse(d.updated_at) : 0
+      if (remoteAt > localAt || !Object.keys(answers).length) {
+        answers = { ...d.answers }
+        submittedAt = d.submitted_at || null
+        saveLocal(); render()
+      }
+      setSave("Disimpan ✓", "ok")
+    } else if (Object.keys(answers).length) {
+      flush()
+    }
+  } catch { online = false }
+})()
+})()
+</script>
+
+</body>
+</html>

@@ -83,6 +83,15 @@ input[type=text]:focus, textarea:focus { outline: none; border-color: var(--acce
 .btn.ghost { background: transparent; color: var(--accent); }
 .note { font-size: 13.5px; }
 .note.ok { color: var(--ok); } .note.warn { color: var(--warn); }
+.pl { display: grid; gap: 8px; }
+.pl-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 8px; align-items: start; }
+.pl-row.extra { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto; }
+.pl-job { background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; font-weight: 600; font-size: 14.5px; line-height: 1.35; min-height: 48px; display: flex; align-items: center; overflow-wrap: anywhere; }
+.pl textarea { min-height: 48px; field-sizing: content; padding: 10px 12px; resize: vertical; }
+.pl-head { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 8px; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.pl-del { font: inherit; font-size: 20px; line-height: 1; width: 40px; height: 48px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--muted); cursor: pointer; }
+.pl-add { justify-self: start; margin-top: 4px; }
+.pl-empty { color: var(--muted); font-size: 14px; }
 #copyBox { display: none; }
 #copyBox.show { display: block; }
 @media (prefers-reduced-motion: reduce) { .fill { transition: none; } html { scroll-behavior: auto; } }
@@ -144,7 +153,7 @@ const SECTIONS = [
     { id: "inspection_kerja", t: "textarea", q: "Kerja mana yang anda MESTI pergi tengok dulu sebelum boleh bagi harga?", help: "Cth: paip dalam dinding, pasang paip baru, kumbahan rumah kedai." },
   ]},
   { id: "harga", title: "Harga & bayaran", why: "Bot guna harga untuk kira deposit dan tunjuk anggaran kepada anda. Anda tentukan sama ada pelanggan nampak harga.", qs: [
-    { id: "senarai_harga", t: "textarea", q: "Senarai harga anda (sila senaraikan SEMUA kerja yang anda buat, dengan harga atau julat harga)", help: "Bahagian paling penting. Lebih lengkap, lebih pandai bot. Cth: Paip bocor PVC RM150 satu titik. Tukar bebola tangki RM350-450. Sinki tersumbat RM250... Kalau ada senarai dalam Excel/gambar, tulis \"ada fail\" dan hantar kepada Aman." },
+    { id: "harga_kerja", t: "pricelist", q: "Harga untuk setiap kerja anda", help: "Kerja di bawah diambil dari jawapan soalan 2. Tulis harga di sebelah setiap kerja: harga tetap, julat, atau cara anda kira. Cth: \"RM150 satu titik\", \"RM350 - RM450 ikut saiz tangki\", \"kena tengok dulu\". Kerja yang belum ada dalam senarai, tekan \"+ Tambah kerja lain\"." },
     { id: "caj_tambahan", t: "textarea", q: "Caj tambahan yang anda kenakan", help: "Cth: pengangkutan kawasan jauh, kerja malam, hujung minggu, kecemasan, panjat siling." },
     { id: "caj_periksa", t: "text", q: "Ada caj datang periksa (inspection)? Berapa? Dipotong jika pelanggan teruskan?", help: "Cth: RM50, dipotong dari harga kerja jika teruskan." },
     { id: "deposit", t: "choice", q: "Adakah anda minta deposit sebelum mula kerja?", opts: ["Tak pernah", "Ya, untuk kerja besar sahaja", "Ya, untuk semua kerja"] },
@@ -193,7 +202,33 @@ try { const s = JSON.parse(localStorage.getItem(LOCAL_KEY) || "null"); if (s) { 
 
 const $ = id => document.getElementById(id)
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]))
-const filled = v => Array.isArray(v) ? v.length > 0 : !!(v && String(v).trim())
+const filled = v => Array.isArray(v) ? v.length > 0
+  : (v && typeof v === "object") ? Object.values(v.prices || {}).some(x => String(x).trim()) || (v.extra || []).some(r => String(r.kerja || "").trim() || String(r.harga || "").trim())
+  : !!(v && String(v).trim())
+
+// Jobs he ticked in question 2 (+ the ones typed under Lain-lain), for the price table.
+function jobList() {
+  const ticked = (Array.isArray(answers.jenis_kerja) ? answers.jenis_kerja : []).filter(j => j !== "Lain-lain")
+  const typed = Array.isArray(answers.jenis_kerja) && answers.jenis_kerja.includes("Lain-lain")
+    ? String(answers.jenis_kerja_lain || "").split(/[,;]+|\n/).map(x => x.trim()).filter(Boolean) : []
+  const seen = new Set(), out = []
+  for (const j of [...ticked, ...typed]) { const k = j.toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(j) } }
+  return out
+}
+function priceVal() {
+  const v = answers.harga_kerja
+  return { prices: { ...((v && v.prices) || {}) }, extra: [...((v && v.extra) || [])].map(r => ({ ...r })) }
+}
+function plInner() {
+  const v = priceVal(), jobs = jobList()
+  const rows = jobs.map(j => `<div class="pl-row"><div class="pl-job">${esc(j)}</div><textarea rows="1" data-pl="price" data-job="${esc(j)}" aria-label="Harga: ${esc(j)}" placeholder="Harga / cara kira">${esc(v.prices[j] || "")}</textarea></div>`).join("")
+  const extra = v.extra.map((r, i) => `<div class="pl-row extra"><input type="text" data-pl="xkerja" data-i="${i}" aria-label="Kerja lain" placeholder="Nama kerja" value="${esc(r.kerja || "")}"><textarea rows="1" data-pl="xharga" data-i="${i}" aria-label="Harga kerja lain" placeholder="Harga / cara kira">${esc(r.harga || "")}</textarea><button type="button" class="pl-del" data-pl="del" data-i="${i}" aria-label="Buang baris">×</button></div>`).join("")
+  return `<div class="pl-head"><span>Kerja</span><span>Harga / cara kira</span></div>`
+    + (jobs.length ? rows : `<p class="pl-empty">Tandakan jenis kerja di soalan 2 dulu, atau tambah kerja di bawah.</p>`)
+    + extra
+    + `<button type="button" class="btn ghost pl-add" data-pl="add">+ Tambah kerja lain</button>`
+}
+function refreshPriceList() { const el = document.querySelector(".pl"); if (el) el.innerHTML = plInner() }
 
 // ── Render ──
 function render() {
@@ -215,6 +250,7 @@ function qHtml(q, n) {
   const head = `<span class="ql"><span class="qn">${n}.</span>${esc(q.q)}</span>${q.help ? `<p class="help">${esc(q.help)}</p>` : ""}`
   if (q.t === "text") return `<div class="q" data-q="${q.id}"><label class="ql" for="f_${q.id}"><span class="qn">${n}.</span>${esc(q.q)}</label>${q.help ? `<p class="help">${esc(q.help)}</p>` : ""}<input type="text" id="f_${q.id}" data-id="${q.id}" value="${esc(v || "")}"></div>`
   if (q.t === "textarea") return `<div class="q" data-q="${q.id}"><label class="ql" for="f_${q.id}"><span class="qn">${n}.</span>${esc(q.q)}</label>${q.help ? `<p class="help">${esc(q.help)}</p>` : ""}<textarea id="f_${q.id}" data-id="${q.id}">${esc(v || "")}</textarea></div>`
+  if (q.t === "pricelist") return `<div class="q" data-q="${q.id}" role="group" aria-label="${esc(q.q)}">${head}<div class="pl">${plInner()}</div></div>`
   const multi = q.t === "multi"
   const sel = multi ? (Array.isArray(v) ? v : []) : v
   const opts = [...q.opts, ...(q.other ? ["Lain-lain"] : [])]
@@ -297,12 +333,34 @@ async function flush() {
 
 // ── Input handling ──
 $("form").addEventListener("input", e => {
+  const pl = e.target.dataset.pl
+  if (pl) {
+    const v = priceVal()
+    if (pl === "price") v.prices[e.target.dataset.job] = e.target.value
+    else if (pl === "xkerja") v.extra[+e.target.dataset.i].kerja = e.target.value
+    else if (pl === "xharga") v.extra[+e.target.dataset.i].harga = e.target.value
+    answers.harga_kerja = v
+    changed()
+    return
+  }
   const id = e.target.dataset.id
   if (!id) return
   answers[id] = e.target.value
+  if (id === "jenis_kerja_lain") refreshPriceList()
   changed()
 })
 $("form").addEventListener("click", e => {
+  const plBtn = e.target.closest("button[data-pl]")
+  if (plBtn) {
+    const v = priceVal()
+    if (plBtn.dataset.pl === "add") v.extra.push({ kerja: "", harga: "" })
+    else v.extra.splice(+plBtn.dataset.i, 1)
+    answers.harga_kerja = v
+    refreshPriceList()
+    if (plBtn.dataset.pl === "add") { const ins = document.querySelectorAll('.pl input[data-pl="xkerja"]'); ins[ins.length - 1]?.focus() }
+    changed()
+    return
+  }
   const chip = e.target.closest(".chip")
   if (!chip) return
   const id = chip.dataset.id, opt = chip.dataset.opt
@@ -325,6 +383,7 @@ $("form").addEventListener("click", e => {
     other.hidden = !on
     if (on && opt === "Lain-lain") other.focus()
   }
+  if (id === "jenis_kerja") refreshPriceList()
   changed()
 })
 
@@ -337,6 +396,13 @@ function asText() {
     for (const q of s.qs) {
       n++
       let v = answers[q.id]
+      if (q.t === "pricelist") {
+        const pv = priceVal()
+        const ls = [...jobList().map(j => `   - ${j}: ${String(pv.prices[j] || "").trim() || "-"}`),
+          ...pv.extra.filter(r => String(r.kerja || "").trim()).map(r => `   - ${r.kerja.trim()}: ${String(r.harga || "").trim() || "-"}`)]
+        lines.push(`${n}. ${q.q}`, filled(answers[q.id]) ? ls.join(String.fromCharCode(10)) : "→ (belum dijawab)", "")
+        continue
+      }
       v = Array.isArray(v) ? v.join(", ") : (v || "")
       const lain = answers[q.id + "_lain"]
       if (lain && String(v).includes("Lain-lain")) v = v.replace("Lain-lain", "Lain-lain: " + lain)

@@ -227,6 +227,7 @@ function plInner() {
     + (jobs.length ? rows : `<p class="pl-empty">Tandakan jenis kerja di soalan 2 dulu, atau tambah kerja di bawah.</p>`)
     + extra
     + `<button type="button" class="btn ghost pl-add" data-pl="add">+ Tambah kerja lain</button>`
+    + (filled(answers.senarai_harga) ? `<label class="help" for="f_senarai_harga" style="margin:10px 0 4px;display:block">Harga yang anda dah tulis sebelum ini (masih disimpan, boleh ubah atau salin ke kotak di atas):</label><textarea id="f_senarai_harga" data-id="senarai_harga">${esc(answers.senarai_harga)}</textarea>` : "")
 }
 function refreshPriceList() { const el = document.querySelector(".pl"); if (el) el.innerHTML = plInner() }
 
@@ -266,7 +267,7 @@ function qHtml(q, n) {
 function refreshAll() {
   let n = 0
   for (const q of ALL) {
-    const ok = filled(answers[q.id])
+    const ok = filled(answers[q.id]) || (q.t === "pricelist" && filled(answers.senarai_harga))
     if (ok) n++
     const card = document.querySelector(`[data-q="${q.id}"]`)
     if (card) card.classList.toggle("answered", ok)
@@ -274,7 +275,7 @@ function refreshAll() {
   $("cnt").textContent = n
   $("fill").style.width = (100 * n / ALL.length) + "%"
   for (const s of SECTIONS) {
-    const done = s.qs.filter(q => filled(answers[q.id])).length
+    const done = s.qs.filter(q => filled(answers[q.id]) || (q.t === "pricelist" && filled(answers.senarai_harga))).length
     const a = document.querySelector(`nav.toc a[data-sec="${s.id}"]`)
     if (a) { a.querySelector(".n").textContent = `${done}/${s.qs.length}`; a.classList.toggle("done", done === s.qs.length) }
   }
@@ -400,7 +401,8 @@ function asText() {
         const pv = priceVal()
         const ls = [...jobList().map(j => `   - ${j}: ${String(pv.prices[j] || "").trim() || "-"}`),
           ...pv.extra.filter(r => String(r.kerja || "").trim()).map(r => `   - ${r.kerja.trim()}: ${String(r.harga || "").trim() || "-"}`)]
-        lines.push(`${n}. ${q.q}`, filled(answers[q.id]) ? ls.join(String.fromCharCode(10)) : "→ (belum dijawab)", "")
+        if (filled(answers.senarai_harga)) ls.push("   Nota: " + String(answers.senarai_harga).trim())
+        lines.push(`${n}. ${q.q}`, ls.length ? ls.join(String.fromCharCode(10)) : "→ (belum dijawab)", "")
         continue
       }
       v = Array.isArray(v) ? v.join(", ") : (v || "")
